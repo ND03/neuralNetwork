@@ -60,43 +60,6 @@ class neuron
 
     };
 
-neuron::neuron ( unsigned numberOfOutput, unsigned myIndex )
-    {
-    for ( unsigned connections = 0; connections < numberOfOutput; connections++ )
-        {
-        outputWeights.push_back ( connection() );
-        outputWeights.back().weight = randomWeight();
-        }
-
-    myIndex = myIndex;
-
-
-    }
-
-void neuron::feedForward ( const layer &previousLayer, unsigned myIndex )
-    {
-    double sum = 0.0;
-
-    for ( unsigned previousLayerNeuron = 0; previousLayerNeuron < previousLayer.size(); previousLayerNeuron++ )
-        {
-        sum = sum + previousLayer [ previousLayerNeuron ].getOutputValue() * previousLayer [ previousLayerNeuron ].outputWeights [ myIndex ].weight;
-        }
-
-    outputValue = neuron::transferFunction ( sum );
-    }
-
-
-double neuron::transferFunction ( double x )
-    {
-    // [ - 1.0 ... 1.0 ];
-
-    return tanh ( x );
-    }
-
-double neuron::transferFunctionDerivative ( double x )
-    {
-    return ( 1.0 - ( x * x ) );
-    }
 
 
 
@@ -142,42 +105,6 @@ net::net ( const std::vector <unsigned> &topology )
     }
 
 
-void net::feedForward ( const std::vector<double> &inputValues )
-    {
-    assert ( inputValues.size() == ( layers [ 0 ].size() - 1 ) );
-
-    for ( unsigned input = 0; input < inputValues.size(); input++ )
-        {
-        layers [ 0 ] [ input ].setOutputValue ( inputValues [ input ] );
-        }
-
-
-    for ( unsigned currentLayer = 1; currentLayer < layers.size(); currentLayer++ )
-        {
-        layer &previousLayer = layers [ currentLayer - 1 ];
-        for ( unsigned currentNeuron = 0; currentNeuron < layers [ currentLayer ].size() - 1; currentNeuron++ )
-            {
-            layers [ currentLayer ] [ currentNeuron ].feedForward ( previousLayer , 1000000 );
-            }
-        }
-    }
-
-
-void net::backProp ( const std::vector<double> &targetValues )
-    {
-    layer &outputLayer = layers.back(); // all error in all net;
-
-    double sumError = 0.0;
-    double delta = 0.0;
-    for ( unsigned currentNeuron = 0; currentNeuron < ( outputLayer.size() - 1 ); currentNeuron++ )
-        {
-        delta = targetValues [ currentNeuron ] - outputLayer [ currentNeuron ].getOutputValue();
-        sumError = sumError + ( delta * delta );
-        }
-
-    sumError = sumError / ( outputLayer.size() - 1 );
-
-    }
 
 
 
@@ -217,4 +144,88 @@ int main()
 
 
     return 0;
+    }
+
+
+
+
+void net::feedForward ( const std::vector<double> &inputValues )
+    {
+    assert ( inputValues.size() == ( layers [ 0 ].size() - 1 ) );
+
+    for ( unsigned input = 0; input < inputValues.size(); input++ )
+        {
+        layers [ 0 ] [ input ].setOutputValue ( inputValues [ input ] );
+        }
+
+
+    for ( unsigned currentLayer = 1; currentLayer < layers.size(); currentLayer++ )
+        {
+        layer &previousLayer = layers [ currentLayer - 1 ];
+        for ( unsigned currentNeuron = 0; currentNeuron < layers [ currentLayer ].size() - 1; currentNeuron++ )
+            {
+            layers [ currentLayer ] [ currentNeuron ].feedForward ( previousLayer , 1000000 );
+            }
+        }
+    }
+
+
+void net::backProp ( const std::vector<double> &targetValues )
+    {
+    layer &outputLayer = layers.back(); // all error in all net;
+
+    double sumError = 0.0;
+    double delta = 0.0;
+    for ( unsigned currentNeuron = 0; currentNeuron < ( outputLayer.size() - 1 ); currentNeuron++ )
+        {
+        delta = targetValues [ currentNeuron ] - outputLayer [ currentNeuron ].getOutputValue();
+        sumError = sumError + ( delta * delta );
+        }
+
+    sumError = sumError / ( outputLayer.size() - 1 );
+
+    }
+
+
+////////
+
+
+
+
+neuron::neuron ( unsigned numberOfOutput, unsigned myIndex )
+    {
+    for ( unsigned connections = 0; connections < numberOfOutput; connections++ )
+        {
+        outputWeights.push_back ( connection() );
+        outputWeights.back().weight = randomWeight();
+        }
+
+    myIndex = myIndex;
+
+
+    }
+
+void neuron::feedForward ( const layer &previousLayer, unsigned myIndex )
+    {
+    double sum = 0.0;
+
+    for ( unsigned previousLayerNeuron = 0; previousLayerNeuron < previousLayer.size(); previousLayerNeuron++ )
+        {
+        sum = sum + previousLayer [ previousLayerNeuron ].getOutputValue() * previousLayer [ previousLayerNeuron ].outputWeights [ myIndex ].weight;
+        }
+
+    outputValue = neuron::transferFunction ( sum );
+    }
+
+
+double neuron::transferFunction ( double x )
+    {
+    // [ - 1.0 ... 1.0 ];
+
+    return tanh ( x );
+    }
+
+double neuron::transferFunctionDerivative ( double x )
+    {
+    return ( 1.0 - ( x * x ) );
     }
