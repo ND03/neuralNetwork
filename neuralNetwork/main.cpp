@@ -102,7 +102,7 @@ net::net ( const std::vector <unsigned> &topology )
 //            std::cout << "Hello I'm new neuron!";
             }
         }
-    }
+    }  
 
 
 
